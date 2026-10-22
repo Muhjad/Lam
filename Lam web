@@ -1,0 +1,282 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f5f4ee" />
+  <title>Rumah Lam — PDF Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=DM+Sans:wght@400;450;500;550;600;650;700&family=Manrope:wght@400;500;600;650;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    :root{--ink:#243b31;--green:#305e47;--muted:#7a8077;--cream:#f5f4ee;--line:#e0e3da;--lime:#dfe8b4}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--cream);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px}
+    button,input,select{font:inherit}
+    button,a,select{ -webkit-tap-highlight-color:transparent}
+    button{cursor:pointer}
+    button:disabled{cursor:wait;opacity:.65}
+    button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #9eb66a;outline-offset:4px}
+    h1,h2,h3,.display{font-family:'Manrope',sans-serif}
+    .brand-icon{background:var(--green);color:#f3f4db;display:grid;place-items:center;width:37px;height:39px;border-radius:11px 11px 11px 3px;font-family:'Amiri',serif;font-size:30px;line-height:1;padding-bottom:6px}
+    .eyebrow{font-size:10px;letter-spacing:1.8px;font-weight:700;text-transform:uppercase}
+    .header{height:84px;border-bottom:1px solid var(--line)}
+    .shell{max-width:1480px;margin:auto;padding:0 48px}
+    .navlink{font-size:12px;color:#6e756c;text-decoration:none;transition:color .2s}
+    .navlink:hover{color:var(--green)}
+    .status-dot{width:6px;height:6px;display:inline-block;background:#799659;border-radius:50%}
+    .workspace{display:grid;grid-template-columns:330px minmax(0,1fr);gap:32px;align-items:start}
+    .settings{background:#fffefa;border:1px solid var(--line);border-radius:15px;overflow:hidden}
+    .setting-block{padding:25px 25px 24px;border-bottom:1px solid #ebede5}
+    .step-number{width:23px;height:23px;border-radius:50%;background:#eef0e6;font-size:10px;display:inline-grid;place-items:center;color:#597049;font-weight:700;margin-right:9px}
+    .dropzone{position:relative;margin-top:20px;border:1.5px dashed #b9c5b2;border-radius:10px;min-height:154px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f7f9f2;transition:background .2s,border .2s}
+    .dropzone:hover,.dropzone.dragging{background:#edf2e4;border-color:var(--green)}
+    .dropzone input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+    .dropzone:focus-within{outline:3px solid #9eb66a;outline-offset:3px}
+    .file-line{display:flex;align-items:center;gap:10px;background:#f0f3e9;border-radius:7px;padding:11px 12px;margin-top:12px;font-size:11px}
+    .template-select{appearance:none;background:#fffefa;border:1px solid #d9ded1;border-radius:7px;padding:12px 35px 12px 13px;width:100%;font-size:12px;color:var(--ink)}
+    .spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+    .spec-grid span{display:block;color:#899083;font-size:10px;margin-bottom:4px}
+    .spec-grid strong{font-size:11px;font-weight:500}
+    .primary{display:flex;justify-content:center;align-items:center;gap:10px;background:var(--green);color:#fff;border:0;border-radius:8px;width:100%;padding:14px;font-weight:600;font-size:12px;transition:background .2s,transform .2s}
+    .primary:hover{background:#234733;transform:translateY(-1px)}
+    .primary:active{transform:translateY(1px)}
+    .text-button{border:0;background:transparent;padding:0;color:var(--green);font-size:11px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+    .preview-panel{border:1px solid #dce0d5;border-radius:15px;overflow:hidden;background:#eaece5}
+    .preview-toolbar{min-height:62px;background:#fffefa;border-bottom:1px solid #dce0d5;padding:15px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .preview-canvas{padding:32px 20px 35px;overflow:auto;background-color:#e9ece4;background-image:radial-gradient(#cbd2c3 .7px,transparent .7px);background-size:13px 13px;min-height:680px}
+    .page-frame{margin:0 auto;position:relative;transition:width .2s}
+    .paper{width:148mm;min-height:210mm;background:#fffefa;padding:15mm 13mm 15mm 25mm;position:relative;color:#253b30;box-shadow:0 5px 20px #364a3014;transform-origin:top left;overflow:hidden}
+    .paper:before{content:'';position:absolute;top:0;bottom:0;left:20mm;border-right:1px dashed #dce3d6}
+    .punches{position:absolute;top:19mm;bottom:19mm;left:8mm;display:flex;flex-direction:column;justify-content:space-between}
+    .punches i{display:block;width:3mm;height:3mm;background:#e9ece4;border:1px solid #d6dccf;border-radius:50%}
+    .worksheet-top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #cdd7c9;padding-bottom:12px;font-size:8px;letter-spacing:1.5px;font-weight:600}
+    .sheet-brand{font-family:'Amiri',serif;font-size:19px;letter-spacing:0}
+    .worksheet-heading{padding-top:24px}
+    .worksheet-heading .arabic-title{font-family:'Amiri',serif;font-size:29px;line-height:1.5}
+    .worksheet-heading h2{font-size:20px;letter-spacing:-.6px;margin:4px 0 6px;font-weight:700}
+    .worksheet-heading p{font-size:9px;color:#7f897b;margin:0}
+    .student-line{display:flex;gap:16px;margin-top:24px;font-size:8px;color:#82907c}
+    .student-line span{display:flex;align-items:center;gap:6px}
+    .student-line i{display:block;border-bottom:1px solid #cfd7c8;width:100px;height:10px}
+    .worksheet-section-label{font-size:8px;font-weight:700;letter-spacing:1.4px;color:#647b58;margin:25px 0 9px;display:flex;align-items:center;gap:8px}
+    .worksheet-section-label:after{content:'';height:1px;background:#e1e5d9;flex:1}
+    .word-row{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;border-bottom:1px solid #e6e9de;padding:12px 0;break-inside:avoid;page-break-inside:avoid}
+    .arabic{font-family:'Amiri',serif;direction:rtl;font-size:29px;line-height:1.9;text-align:center}
+    .trace{color:#bec9b2}
+    .dotted{display:inline-block;border-bottom:2px dotted #91a67e;min-width:28px;margin:0 2px;height:24px}
+    .word-meaning{font-size:9px;line-height:1.6}
+    .word-meaning small{display:block;color:#8e9788;font-size:8px;font-style:italic}
+    .category{font-size:6px;letter-spacing:.5px;text-transform:uppercase;color:#728768;border:1px solid #d8e1cf;border-radius:3px;padding:2px 4px;display:inline-block;margin-top:4px}
+    .sentence-box{background:#f3f5eb;border-left:2px solid #a3b87e;padding:13px 15px;margin-top:12px;break-inside:avoid;page-break-inside:avoid}
+    .sentence-box .arabic{font-size:23px;text-align:right}
+    .sentence-box p{font-size:8px;line-height:1.5;color:#6f7d64;margin:5px 0 0}
+    .practice-line{height:34px;border-bottom:1px dotted #c7d0bb}
+    .worksheet-footer{margin-top:28px;border-top:1px solid #dde3d4;padding-top:10px;display:flex;justify-content:space-between;font-size:7px;color:#7b8972;letter-spacing:.4px}
+    .paper.sticker{width:210mm;min-height:297mm;padding:10mm}
+    .paper.sticker:before,.paper.pocket:before{display:none}
+    .stickers{display:flex;flex-wrap:wrap;gap:2mm;margin-top:18px;align-items:flex-start}
+    .sticker-item{width:36mm;height:36mm;display:flex;flex-direction:column;justify-content:center;align-items:center;border:1px dashed #89967e;break-inside:avoid;page-break-inside:avoid}
+    .sticker-item.circle{border-radius:50%}
+    .sticker-item .arabic{font-size:30px}
+    .sticker-item p{font-size:9px;margin:0}
+    .paper.pocket{width:105mm;min-height:148mm;padding:10mm}
+    .paper.pocket .worksheet-heading{padding-top:15px}
+    .paper.pocket .word-row{padding:6px 0}
+    .paper.pocket .arabic{font-size:25px}
+    .paper.pocket .worksheet-section-label{margin-top:17px}
+    .tip{display:flex;gap:12px;margin:20px 8px;color:#7d8678;font-size:11px;line-height:1.7}
+    .reveal{animation:reveal .6s both}
+    .delay{animation-delay:.1s}
+    @keyframes reveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    dialog{border:1px solid #d6decb;border-radius:16px;padding:30px;background:#fffefa;color:var(--ink);width:min(580px,90vw);max-height:85vh}
+    dialog::backdrop{background:#20362977;backdrop-filter:blur(3px)}
+    pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#eef1e6;padding:15px;border-radius:8px;font-size:11px;line-height:1.6}
+    @media(min-width:1400px){.workspace{grid-template-columns:350px minmax(0,1fr);gap:40px}}
+    @media(max-width:1000px){.shell{padding:0 25px}.workspace{grid-template-columns:285px minmax(0,1fr);gap:20px}.setting-block{padding:22px 19px}}
+    @media(max-width:760px){.shell{padding:0 20px}.header{height:72px}.workspace{grid-template-columns:1fr}.preview-canvas{min-height:500px}.desktop-nav{display:none}.intro{flex-direction:column;align-items:flex-start!important;gap:14px}.setting-block{padding:22px}.settings{display:grid;grid-template-columns:1fr}.preview-toolbar{padding:14px}.footer-inner{flex-direction:column;gap:10px}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+    @media print{
+      html,body,#root{margin:0!important;padding:0!important;background:white!important}
+      .no-print{display:none!important}
+      .shell,.workspace,.preview-panel,.preview-canvas,.page-frame{display:block!important;margin:0!important;padding:0!important;width:auto!important;height:auto!important;min-height:0!important;overflow:visible!important;background:none!important;border:0!important;box-shadow:none!important}
+      .paper{transform:none!important;width:auto!important;min-height:0!important;padding:0!important;box-shadow:none!important;background:white!important;overflow:visible!important}
+      .paper:before,.punches{display:none!important}
+      .word-row,.sentence-box,.sticker-item{break-inside:avoid;page-break-inside:avoid}
+      .worksheet-heading{break-after:avoid}
+      *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    }
+  </style>
+  <style id="print-page">@page { size: 148mm 210mm; margin: 15mm 13mm 15mm 25mm; }</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useRef,useEffect}=React;
+function Icon({name,size=18,...props}){
+ const paths={
+ upload:<><path d="M12 16V4m-4 4 4-4 4 4"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></>,
+ file:<><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8m-8 4h5"/></>,
+ print:<><path d="M6 9V3h12v6M6 17H4V9h16v8h-2M6 14h12v7H6z"/><path d="M17 12h.01"/></>,
+ arrow:<path d="M7 17 17 7M7 7h10v10"/>,
+ chevron:<path d="m8 10 4 4 4-4"/>,
+ check:<path d="m5 12 4 4L19 6"/>,
+ info:<><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/></>,
+ eye:<><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></>,
+ close:<path d="m6 6 12 12M6 18 18 6"/>
+ };
+ return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{paths[name]||paths.file}</svg>
+}
+const sample={
+ metadata:{title:"Little words. Big beginnings.",arabicTitle:"كَلِمَاتِي الْأُولَى",subtitle:"Read, trace, and make each word your own.",lesson:"Everyday essentials",surah:"Al-Fatihah"},
+ ayahNumber:1,
+ words:[
+ {arabic:"بِسْمِ",trace:"بِسْ_",meaning:"In the name of",transliteration:"Bismi",category:"Phrase",shape:"square"},
+ {arabic:"اللَّهِ",trace:"ا_لَّهِ",meaning:"Allah",transliteration:"Allāh",category:"Proper noun",shape:"circle"},
+ {arabic:"الرَّحْمَٰنِ",trace:"الرَّحْ_َٰنِ",meaning:"The Most Merciful",transliteration:"Ar-Raḥmān",category:"Attribute",shape:"square"},
+ {arabic:"الرَّحِيمِ",trace:"الرَّحِ_مِ",meaning:"The Most Compassionate",transliteration:"Ar-Raḥīm",category:"Attribute",shape:"circle"}
+ ],
+ sentences:[{arabic:"بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",translation:"In the name of Allah, the Most Merciful, the Most Compassionate."}]
+};
+const templates={
+ binder:{name:"Binder A5 (20-ring)",dimensions:"148 × 210 mm",margin:"25 mm · left",width:148,height:210,page:"148mm 210mm",margins:"15mm 13mm 15mm 25mm",description:"A little room for your binder. A lot of room to learn."},
+ sticker:{name:"Sticker Sheet A4",dimensions:"210 × 297 mm",margin:"10 mm · all sides",width:210,height:297,page:"210mm 297mm",margins:"10mm",description:"Closely packed, cut-friendly shapes for little discoveries."},
+ pocket:{name:"Pocket Book A6",dimensions:"105 × 148 mm",margin:"10 mm · all sides",width:105,height:148,page:"105mm 148mm",margins:"10mm",description:"Small enough to carry. Meaningful enough to keep."}
+};
+function pick(o,...keys){for(const key of keys)if(o?.[key]!==undefined)return o[key];}
+function normalize(raw){
+ if(!raw||typeof raw!=="object"||Array.isArray(raw))throw new Error("Please upload a JSON object with a Words array.");
+ const words=pick(raw,"words","Words");
+ if(!Array.isArray(words)||!words.length)throw new Error('Your JSON needs a non-empty "words" (or "Words") array.');
+ if(words.length>500)throw new Error("Please use 500 words or fewer per document.");
+ const m=pick(raw,"metadata","Metadata")||{};
+ const str=v=>typeof v==="string"||typeof v==="number"?String(v):"";
+ return {
+ metadata:{title:str(pick(m,"title","Title"))||"My Arabic vocabulary",arabicTitle:str(pick(m,"arabicTitle","ArabicTitle")),subtitle:str(pick(m,"subtitle","Subtitle"))||"Read, trace, and make each word your own.",lesson:str(pick(m,"lesson","Lesson"))||"Vocabulary practice",surah:str(pick(m,"surah","Surah"))},
+ ayahNumber:str(pick(raw,"ayahNumber","Ayah Number","AyahNumber")),
+ words:words.map((w,i)=>{
+  if(!w||typeof w!=="object")throw new Error(`Word ${i+1} must be an object.`);
+  const arabic=str(pick(w,"arabic","Arabic","word","Word"));
+  if(!arabic)throw new Error(`Word ${i+1} is missing an Arabic word.`);
+  const trace=pick(w,"trace","Trace");
+  return {arabic,trace:typeof trace==="string"?trace:arabic,meaning:str(pick(w,"meaning","Meaning","translation","Translation")),transliteration:str(pick(w,"transliteration","Transliteration")),category:str(pick(w,"category","Category")),shape:str(pick(w,"shape","Shape")).toLowerCase()==="circle"?"circle":"square"};
+ }),
+ sentences:(Array.isArray(pick(raw,"sentences","Sentences"))?pick(raw,"sentences","Sentences"):[]).map(s=>typeof s==="string"?{arabic:s,translation:""}:{arabic:str(pick(s,"arabic","Arabic","sentence","Sentence")),translation:str(pick(s,"translation","Translation","meaning","Meaning"))})
+ };
+}
+function Trace({text}){return <div className="arabic trace" lang="ar" dir="rtl">{text.split(/(_+|\.{3,}|…)/g).map((part,i)=>/^(_+|\.{3,}|…)$/.test(part)?<span key={i} className="dotted" aria-label="Missing letter"></span>:<React.Fragment key={i}>{part}</React.Fragment>)}</div>}
+function Sheet({data,template}){
+ const m=data.metadata;
+ return <article className={`paper ${template}`} aria-label="Printable vocabulary worksheet">
+  {template==="binder"&&<div className="punches" aria-hidden="true">{Array.from({length:20},(_,i)=><i key={i}/>)}</div>}
+  <div className="worksheet-top"><span>RUMAH LAM · LEARNING WITH LOVE</span><span className="sheet-brand" lang="ar">لام</span></div>
+  <div className="worksheet-heading">
+   {m.arabicTitle&&<div className="arabic-title" lang="ar" dir="rtl">{m.arabicTitle}</div>}
+   <h2>{m.title}</h2><p>{m.subtitle}</p>
+  </div>
+  {template!=="sticker"&&<div className="student-line"><span>Name <i/></span><span>Date <i style={{width:65}}/></span></div>}
+  <div className="worksheet-section-label">{template==="sticker"?"CUT, STICK & LEARN":"01 / READ & TRACE"} <span style={{fontWeight:400,letterSpacing:0}}>{m.surah}{data.ayahNumber?` · Ayah ${data.ayahNumber}`:""}</span></div>
+  {template==="sticker"?<div className="stickers">{data.words.map((w,i)=><div className={`sticker-item ${w.shape}`} key={i}><div className="arabic" lang="ar">{w.arabic}</div><p>{w.meaning}</p></div>)}</div>:
+   <><div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",fontSize:7,color:"#839178",letterSpacing:1,textTransform:"uppercase"}}><span>Meaning</span><span style={{textAlign:"center"}}>Read</span><span style={{textAlign:"center"}}>Your turn</span></div>
+   {data.words.map((w,i)=><div className="word-row" key={i}><div className="word-meaning">{w.meaning}<small>{w.transliteration}</small>{w.category&&<span className="category">{w.category}</span>}</div><div className="arabic" lang="ar">{w.arabic}</div><Trace text={w.trace}/></div>)}
+   {data.sentences.length>0&&<><div className="worksheet-section-label">02 / PUT IT TOGETHER</div>{data.sentences.map((s,i)=><div className="sentence-box" key={i}><div className="arabic" lang="ar">{s.arabic}</div><p>{s.translation}</p></div>)}</>}
+   <div style={{breakInside:"avoid"}}><div className="worksheet-section-label">03 / A LITTLE PRACTICE</div><div className="practice-line"/><div className="practice-line"/></div></>
+  }
+  <div className="worksheet-footer"><span>A little practice, every day.</span><span>rumah lam / {m.lesson}</span></div>
+ </article>
+}
+function App(){
+ const [data,setData]=useState(sample),[fileName,setFileName]=useState("al-fatihah · sample.json"),[template,setTemplate]=useState("binder"),[drag,setDrag]=useState(false),[error,setError]=useState(""),[busy,setBusy]=useState(false),[zoom,setZoom]=useState(85),[fit,setFit]=useState(.85);
+ const canvas=useRef(null),paper=useRef(null),dialog=useRef(null),input=useRef(null);
+ const spec=templates[template];
+ useEffect(()=>{document.getElementById("print-page").textContent=`@page { size: ${spec.page}; margin: ${spec.margins}; }`;},[template]);
+ useEffect(()=>{
+  const resize=()=>{if(!canvas.current||!paper.current)return;const full=spec.width*96/25.4;const scale=Math.min(zoom/100,(canvas.current.clientWidth-40)/full);setFit(Math.max(.2,scale));};
+  const observer=new ResizeObserver(resize);if(canvas.current)observer.observe(canvas.current);resize();return()=>observer.disconnect();
+ },[template,zoom]);
+ const [height,setHeight]=useState(795);
+ useEffect(()=>{const node=paper.current?.querySelector(".paper");if(!node)return;const obs=new ResizeObserver(()=>setHeight(node.offsetHeight));obs.observe(node);return()=>obs.disconnect()},[data,template]);
+ async function load(file){
+  if(!file)return;setError("");
+  if(file.size>2*1024*1024){setError("Please choose a JSON file smaller than 2 MB.");return;}
+  try{const parsed=JSON.parse(await file.text());setData(normalize(parsed));setFileName(file.name);}
+  catch(e){setError(e instanceof SyntaxError?"This file isn't valid JSON. Check its syntax and try again.":e.message);}
+  if(input.current)input.current.value="";
+ }
+ function downloadSample(){const url=URL.createObjectURL(new Blob([JSON.stringify(sample,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="rumah-lam-sample.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+ async function print(){setBusy(true);try{await document.fonts.ready;await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));window.print();}finally{setBusy(false)}}
+ return <>
+  <header className="header no-print"><div className="shell h-full flex items-center justify-between">
+   <a href="#" className="flex items-center gap-3 no-underline text-inherit" aria-label="Rumah Lam home"><span className="brand-icon" lang="ar">ل</span><div><div className="display text-[17px] font-extrabold tracking-[-.6px]">rumah lam<span className="text-[#819466]">.</span></div><div className="text-[9px] tracking-[1.8px] text-[#859078] mt-0.5">MADE FOR LITTLE LEARNERS</div></div></a>
+   <nav className="flex items-center gap-7" aria-label="Main navigation"><button className="navlink desktop-nav border-0 bg-transparent" onClick={()=>dialog.current.showModal()}>How it works</button><button className="navlink desktop-nav border-0 bg-transparent flex items-center gap-1.5" onClick={downloadSample}>Sample JSON <Icon name="arrow" size={13}/></button><span className="text-[10px] border border-[#dce2d2] px-3 py-1.5 rounded-full flex items-center gap-2 text-[#657854]"><span className="status-dot"/> Print studio</span></nav>
+  </div></header>
+  <main className="shell">
+   <section className="intro no-print flex items-end justify-between pt-10 pb-8 reveal">
+    <div><div className="eyebrow text-[#82916d] mb-3">A thoughtful tool for thoughtful learning</div><h1 className="text-[clamp(26px,3.2vw,42px)] font-bold tracking-[-1.7px] leading-tight m-0">Good words. On paper.</h1><p className="text-[#7b8275] text-[13px] mt-3 mb-0">Turn your Arabic learning content into beautifully printable pages.</p></div>
+    <div className="text-[11px] text-[#819075] flex items-center gap-2 mb-1"><Icon name="check" size={14}/> Your files stay in your browser</div>
+   </section>
+   <div className="workspace reveal delay">
+    <aside className="no-print">
+     <div className="settings">
+      <div className="setting-block">
+       <h2 className="text-[13px] font-bold m-0 flex items-center"><span className="step-number">01</span> Bring your words</h2>
+       <p className="text-[11px] text-[#87907e] mt-2 mb-0">A JSON file is all you need to get started.</p>
+       <div className={`dropzone ${drag?"dragging":""}`} onDragOver={e=>{e.preventDefault();setDrag(true)}} onDragLeave={()=>setDrag(false)} onDrop={e=>{e.preventDefault();setDrag(false);load(e.dataTransfer.files[0])}}>
+        <input ref={input} type="file" accept=".json,application/json" aria-label="Upload vocabulary JSON file" onChange={e=>load(e.target.files[0])}/>
+        <span className="text-[#668155] bg-[#e9eedf] rounded-full p-2.5 mb-3"><Icon name="upload" size={21}/></span>
+        <strong className="text-[11px] font-semibold">Drop your JSON here</strong><span className="text-[10px] text-[#8c9484] mt-1">or <span className="underline underline-offset-2 text-[#526d43]">browse files</span> · up to 2 MB</span>
+       </div>
+       {error&&<p role="alert" className="text-red-700 text-xs mt-3">{error}</p>}
+       <div className="file-line" role="status"><Icon name="file" size={17}/><div className="min-w-0 flex-1"><div className="truncate font-medium">{fileName}</div><div className="text-[9px] text-[#89967c] mt-0.5">{data.words.length} words · {data.sentences.length} sentences</div></div><span className="text-[#71894f]"><Icon name="check" size={14}/></span></div>
+       <div className="mt-4 flex items-center justify-between"><span className="text-[10px] text-[#929888]">Need a starting point?</span><button className="text-button" onClick={downloadSample}>Get sample JSON</button></div>
+      </div>
+      <div className="setting-block">
+       <h2 className="text-[13px] font-bold m-0 flex items-center"><span className="step-number">02</span> Choose your format</h2>
+       <label htmlFor="template" className="block text-[10px] text-[#85907c] mt-5 mb-2">Print template</label>
+       <div className="relative"><select id="template" className="template-select" value={template} onChange={e=>setTemplate(e.target.value)}>{Object.entries(templates).map(([k,t])=><option value={k} key={k}>{t.name}</option>)}</select><span className="absolute right-3 top-3 pointer-events-none text-[#7f8d73]"><Icon name="chevron" size={17}/></span></div>
+       <div className="spec-grid"><div><span>Paper size</span><strong>{spec.dimensions}</strong></div><div><span>Safe margin</span><strong>{spec.margin}</strong></div></div>
+       <div className="mt-4 flex gap-2 text-[10px] leading-relaxed text-[#819273]"><Icon name="info" size={13} className="shrink-0 mt-0.5"/><span>{spec.description}</span></div>
+      </div>
+      <div className="setting-block" style={{borderBottom:0}}>
+       <h2 className="text-[13px] font-bold m-0 flex items-center mb-5"><span className="step-number">03</span> Make it tangible</h2>
+       <button className="primary" onClick={print} disabled={busy}><Icon name="print" size={17}/>{busy?"Preparing your pages…":"Generate PDF"}<span className="ml-auto opacity-70">↗</span></button>
+       <p className="text-center text-[9px] text-[#929988] mb-0 mt-3">Choose “Save as PDF” in your print dialog.</p>
+      </div>
+     </div>
+     <div className="tip"><span className="text-[#8b9b76] mt-0.5 shrink-0"><Icon name="info" size={16}/></span><div><strong className="font-medium text-[#647854]">A small print tip</strong><br/>Use 100% scale and turn off headers & footers. We've taken care of the margins.</div></div>
+    </aside>
+    <section className="preview-panel" aria-label="Live preview">
+     <div className="preview-toolbar no-print">
+      <div className="flex items-center gap-2.5"><Icon name="eye" size={17}/><h2 className="text-[12px] font-semibold m-0">Live preview</h2><span className="text-[8px] tracking-wide bg-[#edf2e4] text-[#768d5d] px-2 py-1 rounded-full hidden sm:inline">READY TO PRINT</span></div>
+      <div className="flex items-center gap-3"><span className="text-[10px] text-[#8c9484] hidden md:inline">{template==="binder"?"A5":template==="sticker"?"A4":"A6"} · Portrait</span><span className="w-px h-4 bg-[#e1e5d8]"/><label className="sr-only" htmlFor="zoom">Preview zoom</label><select id="zoom" value={zoom} onChange={e=>setZoom(Number(e.target.value))} className="text-[10px] text-[#6b795e] border-0 bg-transparent cursor-pointer"><option value={65}>65%</option><option value={85}>85%</option><option value={100}>100%</option></select></div>
+     </div>
+     <div className="preview-canvas" ref={canvas}>
+      <div className="page-frame" ref={paper} style={{width:spec.width*96/25.4*fit,height:height*fit}}>
+       <div style={{transform:`scale(${fit})`,transformOrigin:"top left"}}><Sheet data={data} template={template}/></div>
+      </div>
+      <div className="no-print text-center text-[9px] text-[#87927c] mt-6 tracking-wide">REAL DIMENSIONS. LITTLE DETAILS. READY FOR PAPER.</div>
+     </div>
+    </section>
+   </div>
+  </main>
+  <footer className="shell no-print mt-9"><div className="footer-inner border-t border-[#dfe3d6] py-5 flex justify-between text-[10px] text-[#929989]"><span>Rumah Lam PDF Generator <span className="mx-2 text-[#c1c7b8]">/</span> A little care in every page.</span><span className="flex items-center gap-2">Made for learning, not collecting data. <span className="text-[#839869]">✳</span></span></div></footer>
+  <dialog ref={dialog}>
+   <div className="flex justify-between items-center mb-4"><h2 className="text-xl font-bold m-0">From words to worksheets.</h2><button aria-label="Close instructions" onClick={()=>dialog.current.close()} className="border-0 bg-transparent p-2"><Icon name="close"/></button></div>
+   <p className="text-sm leading-relaxed text-[#75816c]">Upload your JSON, choose a paper format, then select <strong>Generate PDF</strong>. In the print dialog, use “Save as PDF”, 100% scale, and disable browser headers and footers.</p>
+   <h3 className="text-sm font-bold mt-5">JSON structure</h3>
+   <pre>{JSON.stringify({metadata:{title:"My vocabulary",arabicTitle:"كَلِمَاتِي",surah:"Al-Fatihah"},ayahNumber:1,words:[{arabic:"بِسْمِ",trace:"بِسْ_",meaning:"In the name of",category:"Phrase",shape:"circle"}],sentences:[{arabic:"بِسْمِ اللَّهِ",translation:"In the name of Allah"}]},null,2)}</pre>
+   <p className="text-xs leading-relaxed text-[#75816c]">In <strong>trace</strong>, replace target letters with <strong>_</strong>, <strong>...</strong>, or <strong>…</strong> to create dotted writing spaces. Other characters are preserved. Sticker shapes accept <strong>circle</strong> or <strong>square</strong>. Capitalized keys such as <strong>Metadata</strong>, <strong>Words</strong>, and <strong>Ayah Number</strong> are also supported.</p>
+   <button className="primary mt-4" onClick={downloadSample}>Download sample JSON <Icon name="file" size={16}/></button>
+  </dialog>
+ </>
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
+ 
